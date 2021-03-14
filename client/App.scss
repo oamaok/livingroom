@@ -1,0 +1,17 @@
+.app {
+  margin: 100px auto;
+  background: #fff;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.2);
+  width: 300px;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+}
+
+.result {
+  img {
+    height: 80px;
+  }
+}
