@@ -1,23 +1,23 @@
 import { v4 as uuid } from 'uuid'
+
 import {
-  Query,
-  QueryTypes,
-  QueryParameters,
-  QueryReturnValue,
-  QueryRequest,
+  ServerInterface,
+  ServerMethods,
+  ServerApi,
   ServerMessage,
-} from '../common/protocol'
+  ApiRequest,
+} from '../common/api'
 
 const socket = new WebSocket('ws://localhost:8080', ['livingroom'])
 const queries: Map<
   string,
   {
-    request: QueryRequest
+    request: ApiRequest
     resolve: (args: any) => void
   }
 > = new Map()
 
-let requestQueue: QueryRequest[] = []
+let requestQueue: ApiRequest[] = []
 
 socket.addEventListener('message', (msg) => {
   const data: ServerMessage = JSON.parse(msg.data)
@@ -39,20 +39,20 @@ socket.addEventListener('open', () => {
   requestQueue = []
 })
 
-function sendRequest(request: QueryRequest) {
+function sendRequest(request: ApiRequest) {
   socket.send(JSON.stringify(request))
 }
 
-function query<Type extends QueryTypes>(
-  type: Type,
-  parameters: QueryParameters<Type>
-): Promise<QueryReturnValue<Type>> {
-  const request: QueryRequest = {
+function query<Method extends ServerMethods>(
+  method: Method,
+  parameters: Parameters<ServerApi[Method]>
+): Promise<ReturnType<ServerApi[Method]>> {
+  const request: ApiRequest = {
     type: 'QUERY',
     id: uuid(),
     time: Date.now(),
     payload: {
-      type,
+      method,
       parameters,
     },
   }
@@ -63,10 +63,16 @@ function query<Type extends QueryTypes>(
     requestQueue.push(request)
   }
 
-  return new Promise<QueryReturnValue<Type>>((resolve) => {
+  return new Promise<ReturnType<ServerApi[Method]>>((resolve) => {
     // TODO(teemu): Timeouts?
     queries.set(request.id, { request, resolve })
   })
 }
 
-export { query }
+const server = new Proxy<ServerInterface>({} as any, {
+  get: <Method extends ServerMethods>(_: never, name: Method) => (
+    ...parameters: Parameters<ServerApi[Method]>
+  ) => query(name, parameters),
+})
+
+export { server }

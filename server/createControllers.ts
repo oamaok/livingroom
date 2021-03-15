@@ -1,38 +1,23 @@
 import { connection } from 'websocket'
-import {
-  QueryTypes,
-  QueryParameters,
-  QueryReturnValue,
-  QueryRequest,
-  QueryResponse,
-} from '../common/protocol'
 
-type ControllerDefinition<Type extends QueryTypes> = (
-  params: QueryParameters<Type>
-) => QueryReturnValue<Type> | Promise<QueryReturnValue<Type>>
+import { ServerInterface, ApiRequest, ApiResponse } from '../common/api'
 
-type ControllerDefinitions = {
-  [Key in QueryTypes]: (
-    params: QueryParameters<Key>
-  ) => QueryReturnValue<Key> | Promise<QueryReturnValue<Key>>
-}
-
-export function createControllers(struct: ControllerDefinitions) {
+export function createControllers(struct: ServerInterface) {
   return (connection: connection) => {
     connection.on('message', async (message) => {
       if (!message.utf8Data) return
 
-      const { id, payload }: QueryRequest = JSON.parse(message.utf8Data)
+      const { id, payload }: ApiRequest = JSON.parse(message.utf8Data)
 
-      const controller = struct[payload.type] as any
-      const returnValue = await controller(payload.parameters)
+      const controller = struct[payload.method] as any
+      const returnValue = await controller(...payload.parameters)
 
-      const response: QueryResponse = {
+      const response: ApiResponse = {
         id,
         time: Date.now(),
         type: 'QUERY',
         payload: {
-          type: payload.type,
+          method: payload.method,
           returnValue,
         },
       }

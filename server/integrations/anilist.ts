@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { TitleSearchResult } from '../../common/protocol'
+import { TitleSearchResult } from '../../common/api'
 
 // Docs: https://anilist.github.io/ApiV2-GraphQL-Docs/
 type AnilistSuggestion = {
