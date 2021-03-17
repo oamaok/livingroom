@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "lint": "eslint --fix --ext=.ts,.tsx,.js .",
+    "lint": "eslint --ext=.ts,.tsx,.js .",
+    "lint:fix": "yarn lint --fix",
     "start:dev": "yarn start:redis && NODE_ENV=development concurrently --names C,S npm:start:client npm:start:server",
     "start:redis": "docker-compose up -d",
     "start:server": "ts-node-dev --respawn server/index.ts",
