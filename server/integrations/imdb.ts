@@ -1,5 +1,5 @@
 import fetch from 'node-fetch'
-import { TitleSearchResult } from '../../common/api'
+import { TitleSearchResult } from '../../common/types'
 
 type ImdbImage = {
   height: number

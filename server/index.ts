@@ -2,7 +2,7 @@ import { server as WebSocketServer } from 'websocket'
 import { readFile } from 'fs/promises'
 import { resolve } from 'path'
 import { createServer } from 'http'
-import controllers from './controllers'
+import { api } from './api'
 
 const isLocalhost = (url: string) => new URL(url).hostname === 'localhost'
 
@@ -42,5 +42,5 @@ ws.on('request', (req) => {
 
   const connection = req.accept('livingroom', req.origin)
   console.log('[ws] Connection accepted')
-  controllers(connection)
+  api(connection)
 })

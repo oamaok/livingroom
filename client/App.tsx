@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react'
 import { bind } from 'classnames/bind'
 import { server } from './connection'
 import styles from './App.scss'
-import { TitleSearchResult } from '../common/api'
+import { TitleSearchResult } from '../common/types'
 
 const css = bind(styles)
 
@@ -33,7 +33,7 @@ const App = () => {
     debounce(async (term: string) => {
       setResponse({
         loading: false,
-        results: await server.searchByTitle(term),
+        results: await server.searchMedia(term),
       })
     }),
     []
