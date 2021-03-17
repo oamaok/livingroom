@@ -15,7 +15,8 @@ type ApiResponse = CreateApiResponseType<typeof api>
 type ApiRequest = CreateApiRequestType<typeof api>
 `
 
-const verbose = typeof process.env.VERBOSE_TESTS !== 'undefined'
+const verbose =
+  typeof process.env.VERBOSE_TESTS !== 'undefined'
 
 const doesCompile = (code: string) =>
   new Promise((resolve) => {
