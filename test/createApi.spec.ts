@@ -48,6 +48,16 @@ describe('createApi', () => {
         test(arg: Uint8Array): number { return 0 }
       })
     `)
+    await shouldNotCompile(`
+      const api = createApi({
+        test(a: string, b: Document): number { return 0 }
+      })
+    `)
+    await shouldNotCompile(`
+      const api = createApi({
+        test(arg: { foo: string, bar: { foobar: () => void }}): number { return 0 }
+      })
+    `)
   })
 
   it('should not compile with non-json-safe return value', async () => {
@@ -58,12 +68,28 @@ describe('createApi', () => {
     `)
   })
 
-  it('should compile with array types', async () => {
+  it('should compile with deep objects as parameters', async () => {
     await shouldCompile(`
-        const api = createApi({
-          test(a: string[], b: number[], c: boolean[]): number { return 0 }
-        })
-      `)
+      const api = createApi({
+        test(a: { b: { c: string }, d: { e: number }}): number { return 0 }
+      })
+    `)
+  })
+
+  it('should compile with deep objects as return value', async () => {
+    await shouldCompile(`
+      const api = createApi({
+        test(a: number): { b: { c: string }, d: { e: number }} { return { b: { c: '' }, d: { e: 0 }} }
+      })
+    `)
+  })
+
+  it('should compile with array types as parameters', async () => {
+    await shouldCompile(`
+      const api = createApi({
+        test(a: string[], b: number[], c: boolean[]): number { return 0 }
+      })
+    `)
   })
 
   // TODO: Add support for no params
